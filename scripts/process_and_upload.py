@@ -1,9 +1,11 @@
 import os
 import pandas as pd
+import gspread
 import re
 import json
 from google.oauth2.service_account import Credentials
 from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
 
 # =============== CONFIG ===============
 INPUT_FOLDER = "/home/runner/work/ferias_sci/ferias_sci/downloads"
