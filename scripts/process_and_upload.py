@@ -89,43 +89,54 @@ def merge_all_files():
 def upload_to_google_sheets(df):
     creds_json = os.getenv("GSA_CREDENTIALS")
     if creds_json is None:
-        logging.error("Google credentials not found in environment variables.")
+        print("❌ Google credentials not found in environment variables.")
         return
 
+    # Load credentials
     creds_dict = json.loads(creds_json)
-    scope = ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
+    scope = [
+        "https://www.googleapis.com/auth/spreadsheets",
+        "https://www.googleapis.com/auth/drive"
+    ]
     creds = Credentials.from_service_account_info(creds_dict, scopes=scope)
-    client = gspread.authorize(creds)
-    '''print("Attempting to list spreadsheets...")
-    for spreadsheet in client.openall():
-        print("Found:", spreadsheet.title)'''
 
-    # Open spreadsheet and worksheet
+    # Authorize gspread (optional but you use it)
+    client = gspread.authorize(creds)
+
+    # Open spreadsheet and sheet
     try:
         spreadsheet = client.open_by_key(SPREADSHEET_ID)
         sheet = spreadsheet.worksheet(SHEET_NAME)
     except Exception as e:
-        print(f"Error accessing spreadsheet: {e}")
+        print(f"❌ Error accessing spreadsheet: {e}")
         return
 
-    values = [df.columns.tolist()] + df.values.tolist()
+    # Build Sheets API service (REQUIRED)
+    service = build("sheets", "v4", credentials=creds)
+
+    # Prepare DataFrame for upload
+    values = [df.columns.tolist()] + df.astype(str).values.tolist()
     body = {"values": values}
 
-    # Clear sheet
-    service.spreadsheets().values().clear(
-        spreadsheetId=SPREADSHEET_ID,
-        range=SHEET_NAME
-    ).execute()
+    try:
+        # Clear sheet first
+        service.spreadsheets().values().clear(
+            spreadsheetId=SPREADSHEET_ID,
+            range=SHEET_NAME
+        ).execute()
 
-    # Upload
-    service.spreadsheets().values().update(
-        spreadsheetId=SPREADSHEET_ID,
-        range=SHEET_NAME,
-        valueInputOption="RAW",
-        body=body
-    ).execute()
+        # Upload new data
+        service.spreadsheets().values().update(
+            spreadsheetId=SPREADSHEET_ID,
+            range=SHEET_NAME,
+            valueInputOption="RAW",
+            body=body
+        ).execute()
 
-    print("✅ Uploaded successfully to Google Sheets!")
+        print("✅ Uploaded successfully to Google Sheets!")
+
+    except Exception as e:
+        print(f"❌ Error uploading to Google Sheets: {e}")
 
 # === MAIN ===
 if __name__ == "__main__":
