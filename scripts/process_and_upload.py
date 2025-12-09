@@ -111,6 +111,25 @@ def upload_to_google_sheets(df):
         print(f"❌ Error accessing spreadsheet: {e}")
         return
 
+    # === FORCE FIXED HEADER ===
+    desired_header = [
+        "Filial",
+        "Código",
+        "Nome do colaborador",
+        "Período aquisitivo de férias",
+        "Vencimento",
+        "Último prazo 30 dias",
+        "Último prazo 60 dias",
+        "Saldo"
+    ]
+    
+    # Remove any existing header row that may be in the data
+    df.columns = desired_header
+    
+    # === SORT BY 'Filial' A → Z ===
+    if "Filial" in df.columns:
+        df = df.sort_values(by="Filial", ascending=True)
+
     # Build Sheets API service (REQUIRED)
     service = build("sheets", "v4", credentials=creds)
 
