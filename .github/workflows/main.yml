@@ -25,11 +25,6 @@ jobs:
           pip install pandas
           pip install google-api-python-client google-auth google-auth-oauthlib google-auth-httplib2
       
-      # Create Google credentials file from secret
-      - name: Create credentials file
-        run: |
-          echo "${{ secrets.GSA_CREDENTIALS }}" > creds.json
-      
       # Run Selenium scraper
       - name: Run Selenium scraper
         env:
@@ -43,6 +38,6 @@ jobs:
         env:
           SPREADSHEET_ID: ${{ secrets.SPREADSHEET_ID }}
           SHEET_NAME: ${{ secrets.SHEET_NAME }}
-          GSA_CREDENTIALS: creds.json
+          GSA_CREDENTIALS: ${{ secrets.GSA_CREDENTIALS }}
         run: |
           python scripts/process_and_upload.py 
