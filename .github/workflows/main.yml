@@ -23,6 +23,7 @@ jobs:
           pip install selenium
           pip install webdriver-manager
           pip install pandas
+          pip install gspread
           pip install google-api-python-client google-auth google-auth-oauthlib google-auth-httplib2
       
       # Run Selenium scraper
