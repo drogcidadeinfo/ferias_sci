@@ -8,7 +8,6 @@ from googleapiclient.discovery import build
 INPUT_FOLDER = "/home/runner/work/ferias_sci/ferias_sci/downloads"
 SPREADSHEET_ID = os.getenv("SPREADSHEET_ID")
 SHEET_NAME = os.getenv("SHEET_NAME")
-CREDENTIALS_FILE = os.getenv("GSA_CREDENTIALS")
 # =====================================
 
 # === Extract filial from filename ===
@@ -85,9 +84,26 @@ def merge_all_files():
 
 # === Upload to Google Sheets ===
 def upload_to_google_sheets(df):
-    scopes = ["https://www.googleapis.com/auth/spreadsheets"]
-    creds = Credentials.from_service_account_file(CREDENTIALS_FILE, scopes=scopes)
-    service = build("sheets", "v4", credentials=creds)
+    creds_json = os.getenv("GSA_CREDENTIALS")
+    if creds_json is None:
+        logging.error("Google credentials not found in environment variables.")
+        return
+
+    creds_dict = json.loads(creds_json)
+    scope = ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
+    creds = Credentials.from_service_account_info(creds_dict, scopes=scope)
+    client = gspread.authorize(creds)
+    print("Attempting to list spreadsheets...")
+    for spreadsheet in client.openall():
+        print("Found:", spreadsheet.title)
+
+    # Open spreadsheet and worksheet
+    try:
+        spreadsheet = client.open_by_key(SPREADSHEET_ID)
+        sheet = spreadsheet.worksheet(SHEET_NAME)
+    except Exception as e:
+        print(f"Error accessing spreadsheet: {e}")
+        return
 
     values = [df.columns.tolist()] + df.values.tolist()
     body = {"values": values}
