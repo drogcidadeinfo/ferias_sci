@@ -1,0 +1,43 @@
+name: SCI Web Automation
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 8 10 * *"   # Run on the 10th day of every month at 08:00 UTC
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install selenium
+          pip install webdriver-manager
+          pip install pandas
+          pip install google-api-python-client google-auth google-auth-oauthlib google-auth-httplib2
+
+      # Run Selenium scraper
+      - name: Run Selenium scraper
+        env:
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+        run: |
+          python scripts/download_table.py
+
+      # Process CSVs and upload to Google Sheets
+      #- name: Process CSVs and upload to Google Sheets
+       # env:
+        #  SPREADSHEET_ID: ${{ secrets.SPREADSHEET_ID }}
+         # SHEET_NAME: ${{ secrets.SHEET_NAME }}
+          #GSA_CREDENTIALS: ${{ secrets.GSA_CREDENTIALS }}
+        #run: |
+         # python scripts/process_and_upload.py 
