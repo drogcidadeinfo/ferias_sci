@@ -5,7 +5,7 @@ from google.oauth2.service_account import Credentials
 from googleapiclient.discovery import build
 
 # =============== CONFIG ===============
-INPUT_FOLDER = "downloads"
+INPUT_FOLDER = "/home/runner/work/ferias_sci/ferias_sci/downloads"
 SPREADSHEET_ID = os.getenv("SPREADSHEET_ID")
 SHEET_NAME = os.getenv("SHEET_NAME")
 CREDENTIALS_FILE = os.getenv("GSA_CREDENTIALS")
