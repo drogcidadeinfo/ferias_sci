@@ -96,9 +96,9 @@ def upload_to_google_sheets(df):
     scope = ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
     creds = Credentials.from_service_account_info(creds_dict, scopes=scope)
     client = gspread.authorize(creds)
-    print("Attempting to list spreadsheets...")
+    '''print("Attempting to list spreadsheets...")
     for spreadsheet in client.openall():
-        print("Found:", spreadsheet.title)
+        print("Found:", spreadsheet.title)'''
 
     # Open spreadsheet and worksheet
     try:
