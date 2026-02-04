@@ -172,7 +172,7 @@ try:
 
         campo = wait.until(EC.presence_of_element_located((By.XPATH, '//input[@id="competencia"]')))
         campo.clear()
-        campo.send_keys(""12/2025)
+        campo.send_keys("12/2025")
 
         select2 = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "#s2id_ordenar .select2-choice")))
         select2.click()
